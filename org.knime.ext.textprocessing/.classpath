@@ -4,6 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="src-deprecated"/>
+	<classpathentry kind="src" path="js-src"/>
 	<classpathentry exported="true" kind="lib" path="lib/abner.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/Snowball.jar"/>
 	<classpathentry kind="output" path="bin"/>
