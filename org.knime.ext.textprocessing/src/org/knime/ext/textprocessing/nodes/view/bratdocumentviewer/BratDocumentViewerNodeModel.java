@@ -167,10 +167,9 @@ public class BratDocumentViewerNodeModel
      * @return a list of JSON objects containing the terms and tags
      */
     public static List<JSONObject> processTagsAndTerms(final Document doc) {
-        // TODO what happens if there are no tags?
         List<JSONObject> result = new ArrayList<JSONObject>();
         List<Term> terms = getTerms(doc);
-        String text = doc.getDocumentBodyText();
+        String text = doc.getText();
         // mark the start position to search a term in the text
         int i = 0;
         // we need count for the entity naming, e.g T1, T2, etc
@@ -194,8 +193,8 @@ public class BratDocumentViewerNodeModel
                     String tag = tags.get(j).getTagValue();
                     // add the tag to the entity as well
                     docDataJson.put(TAG_KEY, StringUtils.capitalize(tag.toLowerCase()));
-                    docDataJson.put(FIRSTPOS_KEY, Integer.toString(startIndex));
-                    docDataJson.put(LASTPOS_KEY, Integer.toString(stopIndex));
+                    docDataJson.put(FIRSTPOS_KEY, startIndex);
+                    docDataJson.put(LASTPOS_KEY, stopIndex);
                     docDataJson.put(TERM_KEY, term);
                     result.add(docDataJson);
                 }
@@ -227,14 +226,20 @@ public class BratDocumentViewerNodeModel
     private void setDocumentData(final Document doc) {
         List<JSONObject> terms = processTagsAndTerms(doc);
         performReset();
+        // we don't want to include the title in the body text
+        int titleLength = doc.getTitle().length();
 
         for (JSONObject obj : terms) {
-            m_ids.add(obj.getString(ID_KEY));
-            String tag = obj.getString(TAG_KEY);
-            m_tags.add(tag);
-            m_terms.add(obj.getString(TERM_KEY));
-            m_startIdx.add(obj.getString(FIRSTPOS_KEY));
-            m_stopIdx.add(obj.getString(LASTPOS_KEY));
+            int firstPos = obj.getInt(FIRSTPOS_KEY) - titleLength;
+            int lastPos = obj.getInt(LASTPOS_KEY) - titleLength;
+            if (firstPos >= 0) {
+                m_ids.add(obj.getString(ID_KEY));
+                String tag = obj.getString(TAG_KEY);
+                m_tags.add(tag);
+                m_terms.add(obj.getString(TERM_KEY));
+                m_startIdx.add(Integer.toString(firstPos));
+                m_stopIdx.add(Integer.toString(lastPos));
+            }
         }
     }
 
