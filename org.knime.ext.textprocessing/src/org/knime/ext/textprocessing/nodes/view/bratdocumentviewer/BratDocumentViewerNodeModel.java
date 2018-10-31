@@ -410,6 +410,9 @@ public class BratDocumentViewerNodeModel
                     rep.setTags(m_tags);
                     rep.setStartIndexes(m_startIdx);
                     rep.setStopIndexes(m_stopIdx);
+                    if (it.hasNext()) {
+                        setWarningMessage("Only document in the first row is visualized in the view.");
+                    }
                 } else {
                     // If there is no document in the first row
                     // set warning message
