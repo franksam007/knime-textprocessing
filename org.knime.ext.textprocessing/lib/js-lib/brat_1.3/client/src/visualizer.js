@@ -345,7 +345,7 @@ var Visualizer = (function($, window, undefined) {
 
       // due to silly Chrome bug, I have to make it pay attention
       var forceRedraw = function() {
-        if (!$.browser.chrome) return; // not needed
+        // if (!$.browser.chrome) return; // not needed
         $svg.css('margin-bottom', 1);
         setTimeout(function() { $svg.css('margin-bottom', 0); }, 0);
       }
@@ -2769,51 +2769,54 @@ Util.profileStart('before render');
         var id;
         if (id = target.attr('data-span-id')) {
           commentId = id;
+         
           var span = data.spans[id];
-          dispatcher.post('displaySpanComment', [
-              evt, target, id, span.type, span.attributeText,
-              span.text,
-              span.comment && span.comment.text,
-              span.comment && span.comment.type,
-              span.normalizations]);
+          if(span){
+            dispatcher.post('displaySpanComment', [
+                evt, target, id, span.type, span.attributeText,
+                span.text,
+                span.comment && span.comment.text,
+                span.comment && span.comment.type,
+                span.normalizations]);
 
-          var spanDesc = spanTypes[span.type];
-          var bgColor = ((spanDesc && spanDesc.bgColor) ||
-                         (spanTypes.SPAN_DEFAULT && spanTypes.SPAN_DEFAULT.bgColor) ||
-                         '#ffffff');
-          highlight = [];
-          $.each(span.fragments, function(fragmentNo, fragment) {
-            highlight.push(svg.rect(highlightGroup,
-                                 fragment.highlightPos.x, fragment.highlightPos.y,
-                                 fragment.highlightPos.w, fragment.highlightPos.h,
-                                 { 'fill': bgColor, opacity:0.75,
-                                   rx: highlightRounding.x,
-                                   ry: highlightRounding.y,
-                                 }));
-          });
-
-          if (that.arcDragOrigin) {
-            target.parent().addClass('highlight');
-          } else {
-            highlightArcs = $svg.
-                find('g[data-from="' + id + '"], g[data-to="' + id + '"]').
-                addClass('highlight');
-            var spans = {};
-            spans[id] = true;
-            var spanIds = [];
-            $.each(span.incoming, function(arcNo, arc) {
-                spans[arc.origin] = true;
+            var spanDesc = spanTypes[span.type];
+            var bgColor = ((spanDesc && spanDesc.bgColor) ||
+                           (spanTypes.SPAN_DEFAULT && spanTypes.SPAN_DEFAULT.bgColor) ||
+                           '#ffffff');
+            highlight = [];
+            $.each(span.fragments, function(fragmentNo, fragment) {
+              highlight.push(svg.rect(highlightGroup,
+                                   fragment.highlightPos.x, fragment.highlightPos.y,
+                                   fragment.highlightPos.w, fragment.highlightPos.h,
+                                   { 'fill': bgColor, opacity:0.75,
+                                     rx: highlightRounding.x,
+                                     ry: highlightRounding.y,
+                                   }));
             });
-            $.each(span.outgoing, function(arcNo, arc) {
-                spans[arc.target] = true;
-            });
-            $.each(spans, function(spanId, dummy) {
-                spanIds.push('rect[data-span-id="' + spanId + '"]');
-            });
-            highlightSpans = $svg.
-                find(spanIds.join(', ')).
-                parent().
-                addClass('highlight');
+          
+            if (that.arcDragOrigin) {
+              target.parent().addClass('highlight');
+            } else {
+              highlightArcs = $svg.
+                  find('g[data-from="' + id + '"], g[data-to="' + id + '"]').
+                  addClass('highlight');
+              var spans = {};
+              spans[id] = true;
+              var spanIds = [];
+              $.each(span.incoming, function(arcNo, arc) {
+                  spans[arc.origin] = true;
+              });
+              $.each(span.outgoing, function(arcNo, arc) {
+                  spans[arc.target] = true;
+              });
+              $.each(spans, function(spanId, dummy) {
+                  spanIds.push('rect[data-span-id="' + spanId + '"]');
+              });
+              highlightSpans = $svg.
+                  find(spanIds.join(', ')).
+                  parent().
+                  addClass('highlight');
+            }
           }
           forceRedraw();
         } else if (!that.arcDragOrigin && (id = target.attr('data-arc-role'))) {
@@ -3070,41 +3073,42 @@ Util.profileStart('before render');
 
       // If we are yet to load our fonts, dispatch them
       if (!Visualizer.areFontsLoaded) {
-        var webFontConfig = {
-          custom: {
-            families: [
-              'Astloch',
-              'PT Sans Caption',
-              //        'Ubuntu',
-              'Liberation Sans'
-            ],
-            /* For some cases, in particular for embedding, we need to
-              allow for fonts being hosted elsewhere */
-            urls: webFontURLs !== undefined ? webFontURLs : [
-              'static/fonts/Astloch-Bold.ttf',
-              'static/fonts/PT_Sans-Caption-Web-Regular.ttf',
-              //
-              'static/fonts/Liberation_Sans-Regular.ttf'
-            ],
-          },
-          active: proceedWithFonts,
-          inactive: proceedWithFonts,
-          fontactive: function(fontFamily, fontDescription) {
-            // Note: Enable for font debugging
-            //console.log("font active: ", fontFamily, fontDescription);
-          },
-          fontloading: function(fontFamily, fontDescription) {
-            // Note: Enable for font debugging
-            //console.log("font loading:", fontFamily, fontDescription);
-          },
-        };
-        WebFont.load(webFontConfig);
-        setTimeout(function() {
-          if (!Visualizer.areFontsLoaded) {
-            console.error('Timeout in loading fonts');
-            proceedWithFonts();
-          }
-        }, fontLoadTimeout);
+      //   var webFontConfig = {
+      //     custom: {
+      //       families: [
+      //         'Astloch',
+      //         'PT Sans Caption',
+      //         //        'Ubuntu',
+      //         'Liberation Sans'
+      //       ],
+      //       /* For some cases, in particular for embedding, we need to
+      //         allow for fonts being hosted elsewhere */
+      //       urls: webFontURLs !== undefined ? webFontURLs : [
+      //         'static/fonts/Astloch-Bold.ttf',
+      //         'static/fonts/PT_Sans-Caption-Web-Regular.ttf',
+      //         //
+      //         'static/fonts/Liberation_Sans-Regular.ttf'
+      //       ],
+      //     },
+      //     active: proceedWithFonts,
+      //     inactive: proceedWithFonts,
+      //     fontactive: function(fontFamily, fontDescription) {
+      //       // Note: Enable for font debugging
+      //       //console.log("font active: ", fontFamily, fontDescription);
+      //     },
+      //     fontloading: function(fontFamily, fontDescription) {
+      //       // Note: Enable for font debugging
+      //       //console.log("font loading:", fontFamily, fontDescription);
+      //     },
+      //   };
+      //   WebFont.load(webFontConfig);
+      //   setTimeout(function() {
+      //     if (!Visualizer.areFontsLoaded) {
+      //       console.error('Timeout in loading fonts');
+      //       proceedWithFonts();
+      //     }
+      //   }, fontLoadTimeout);
+        proceedWithFonts();
       }
 
       dispatcher.
