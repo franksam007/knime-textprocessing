@@ -692,14 +692,14 @@
             factory-class="org.knime.ext.textprocessing.nodes.tagging.dict.multicolumn.DictionaryTaggerMultiColumnNodeFactory">
       </node>
       <node
-            category-path="/applications/textprocessing/io"
+            category-path="/applications/textprocessing/misc"
             deprecated="false"
-            factory-class="org.knime.ext.textprocessing.nodes.source.modelreader.OpenNlpNeModelReader.OpenNlpNeModelReaderNodeFactory">
+            factory-class="org.knime.ext.textprocessing.nodes.view.bratdocumentviewer.BratDocumentViewerNodeFactory">
       </node>
       <node
             category-path="/applications/textprocessing/misc"
             deprecated="false"
-            factory-class="org.knime.ext.textprocessing.nodes.view.bratdocumentviewer.BratDocumentViewerNodeFactory">
+            factory-class="org.knime.ext.textprocessing.nodes.misc.bratdocumentwriter.BratDocumentWriterNodeFactory">
       </node>
    </extension>
    <extension
@@ -876,15 +876,6 @@
             specClass="org.knime.ext.textprocessing.data.DocumentVectorPortObjectSpec"
             specSerializer="org.knime.ext.textprocessing.data.DocumentVectorPortObjectSpec$Serializer">
       </portType>
-      <portType
-            color="#be24d2"
-            hidden="false"
-            name="OpenNlpNerTaggerModelPortObject"
-            objectClass="org.knime.ext.textprocessing.data.OpenNlpNerTaggerModelPortObject"
-            objectSerializer="org.knime.ext.textprocessing.data.OpenNlpNerTaggerModelPortObject$Serializer"
-            specClass="org.knime.ext.textprocessing.data.OpenNlpNerTaggerModelPortObjectSpec"
-            specSerializer="org.knime.ext.textprocessing.data.OpenNlpNerTaggerModelPortObjectSpec$Serializer">
-      </portType>
    </extension>
    <extension
          point="org.knime.ext.textprocessing.TokenizerFactory">
@@ -1043,6 +1034,9 @@
          <webDependency
                webResourceBundleID="brat_1.3">
          </webDependency>
+         <webDependency
+               webResourceBundleID="D3_3.2.8">
+         </webDependency>
       </webResourceBundle>
       <webResourceBundle
             debug="false"
@@ -1059,15 +1053,7 @@
                type="CSS">
          </importResource>
          <importResource
-               relativePath="lib/js-lib/brat_1.3/client/src/ajax.js"
-               type="JAVASCRIPT">
-         </importResource>
-         <importResource
                relativePath="lib/js-lib/brat_1.3/client/src/annotation_log.js"
-               type="JAVASCRIPT">
-         </importResource>
-         <importResource
-               relativePath="lib/js-lib/brat_1.3/client/src/annotator_ui.js"
                type="JAVASCRIPT">
          </importResource>
          <importResource
@@ -1076,14 +1062,6 @@
          </importResource>
          <importResource
                relativePath="lib/js-lib/brat_1.3/client/src/dispatcher.js"
-               type="JAVASCRIPT">
-         </importResource>
-         <importResource
-               relativePath="lib/js-lib/brat_1.3/client/src/offline_ajax.js"
-               type="JAVASCRIPT">
-         </importResource>
-         <importResource
-               relativePath="lib/js-lib/brat_1.3/client/src/spinner.js"
                type="JAVASCRIPT">
          </importResource>
          <importResource
@@ -1098,24 +1076,8 @@
                relativePath="lib/js-lib/brat_1.3/client/src/visualizer.js"
                type="JAVASCRIPT">
          </importResource>
-         <importResource
-               relativePath="lib/js-lib/brat_1.3/client/src/visualizer_ui.js"
-               type="JAVASCRIPT">
-         </importResource>
-         <webDependency
-               webResourceBundleID="head_0.9">
-         </webDependency>
-         <webDependency
-               webResourceBundleID="jQuery_bbq_1.2.1">
-         </webDependency>
-         <webDependency
-               webResourceBundleID="jQuery_json">
-         </webDependency>
          <webDependency
                webResourceBundleID="jQuery_1.11.0">
-         </webDependency>
-         <webDependency
-               webResourceBundleID="jQueryUi_1.10.4">
          </webDependency>
          <webDependency
                webResourceBundleID="jQuery_svg_1.4.3">
@@ -1123,57 +1085,6 @@
          <webDependency
                webResourceBundleID="jQuery_svgdom_1.4.3">
          </webDependency>
-         <webDependency
-               webResourceBundleID="webfont">
-         </webDependency>
-         <webDependency
-               webResourceBundleID="jQuery_sprintf">
-         </webDependency>
-      </webResourceBundle>
-      <webResourceBundle
-            debug="false"
-            name="Head_0.9"
-            usesDefine="false"
-            version="0.9"
-            webResourceBundleID="head_0.9">
-         <webResource
-               relativePathSource="lib/js-lib/brat_1.3/client/lib/"
-               relativePathTarget="lib/js-lib/brat_1.3/client/lib/">
-         </webResource>
-         <importResource
-               relativePath="lib/js-lib/brat_1.3/client/lib/head.load.min.js"
-               type="JAVASCRIPT">
-         </importResource>
-      </webResourceBundle>
-      <webResourceBundle
-            debug="false"
-            name="JQuery_BBQ_1.2.1"
-            usesDefine="false"
-            version="1.2.1"
-            webResourceBundleID="jQuery_bbq_1.2.1">
-         <webResource
-               relativePathSource="lib/js-lib/brat_1.3/client/lib/"
-               relativePathTarget="lib/js-lib/brat_1.3/client/lib/">
-         </webResource>
-         <importResource
-               relativePath="lib/js-lib/brat_1.3/client/lib/jquery.ba-bbq.min.js"
-               type="JAVASCRIPT">
-         </importResource>
-      </webResourceBundle>
-      <webResourceBundle
-            debug="false"
-            name="JQuery_JSON"
-            usesDefine="false"
-            version="1.0"
-            webResourceBundleID="jQuery_json">
-         <webResource
-               relativePathSource="lib/js-lib/brat_1.3/client/lib/"
-               relativePathTarget="lib/js-lib/brat_1.3/client/lib/">
-         </webResource>
-         <importResource
-               relativePath="lib/js-lib/brat_1.3/client/lib/jquery.json.min.js"
-               type="JAVASCRIPT">
-         </importResource>
       </webResourceBundle>
       <webResourceBundle
             debug="false"
@@ -1202,36 +1113,6 @@
          </webResource>
          <importResource
                relativePath="lib/js-lib/brat_1.3/client/lib/jquery.svgdom.min.js"
-               type="JAVASCRIPT">
-         </importResource>
-      </webResourceBundle>
-      <webResourceBundle
-            debug="false"
-            name="Webfont"
-            usesDefine="false"
-            version="1.0"
-            webResourceBundleID="webfont">
-         <webResource
-               relativePathSource="lib/js-lib/brat_1.3/client/lib/"
-               relativePathTarget="lib/js-lib/brat_1.3/client/lib/">
-         </webResource>
-         <importResource
-               relativePath="lib/js-lib/brat_1.3/client/lib/webfont.js"
-               type="JAVASCRIPT">
-         </importResource>
-      </webResourceBundle>
-      <webResourceBundle
-            debug="false"
-            name="JQuery_sprintf"
-            usesDefine="false"
-            version="1.0"
-            webResourceBundleID="jQuery_sprintf">
-         <webResource
-               relativePathSource="lib/js-lib/brat_1.3/client/lib/"
-               relativePathTarget="lib/js-lib/brat_1.3/client/lib/">
-         </webResource>
-         <importResource
-               relativePath="lib/js-lib/brat_1.3/client/lib/jquery.sprintf.js"
                type="JAVASCRIPT">
          </importResource>
       </webResourceBundle>
