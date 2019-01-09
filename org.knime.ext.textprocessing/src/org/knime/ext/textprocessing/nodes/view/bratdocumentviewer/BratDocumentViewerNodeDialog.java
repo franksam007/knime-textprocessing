@@ -59,10 +59,20 @@ import org.knime.ext.textprocessing.data.DocumentValue;
  *
  * @author Andisa Dewi, KNIME AG, Berlin, Germany
  */
-public class BratDocumentViewerNodeDialog extends DefaultNodeSettingsPane {
+final class BratDocumentViewerNodeDialog extends DefaultNodeSettingsPane {
 
+    /**
+     * The configuration key for the column name of the doc column.
+     */
+    private static final String CFG_DOC_COLNAME = "DocColName";
+
+    /**
+     * Get the document column SettingsModel.
+     *
+     * @return the SettingsModelString for document column
+     */
     static final SettingsModelString getDocColModel() {
-        return new SettingsModelString(BratDocumentViewerConfigKeys.DOC_COLNAME, "");
+        return new SettingsModelString(CFG_DOC_COLNAME, "");
     }
 
     /**

@@ -48,14 +48,19 @@
  */
 package org.knime.ext.textprocessing.nodes.view.bratdocumentviewer;
 
+import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.ext.textprocessing.data.Document;
 import org.knime.js.core.JSONViewContent;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -69,7 +74,47 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  */
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class BratDocumentViewerRepresentation extends JSONViewContent {
+public final class BratDocumentViewerRepresentation extends JSONViewContent {
+
+    /**
+     * The configuration key to store the document text.
+     */
+    private static final String CFG_DOC_TEXT = "documentText";
+
+    /**
+     * The configuration key to store the document title.
+     */
+    private static final String CFG_DOC_TITLE = "documentTitle";
+
+    /**
+     * The configuration key to store the term IDs.
+     */
+    private static final String CFG_DOC_TERM_IDS = "documentTermIds";
+
+    /**
+     * The configuration key to store the terms.
+     */
+    private static final String CFG_DOC_TERMS = "documentTerms";
+
+    /**
+     * The configuration key to store the tags.
+     */
+    private static final String CFG_DOC_TAGS = "documentTags";
+
+    /**
+     * The configuration key to store the start indexes.
+     */
+    private static final String CFG_DOC_START_IDX = "documentStartIndexes";
+
+    /**
+     * The configuration key to store the stop indexes.
+     */
+    private static final String CFG_DOC_STOP_IDX = "documentStopIndexes";
+
+    /**
+     * The configuration key to store the tag colors.
+     */
+    private static final String CFG_DOC_COLORS = "documentTagColors";
 
     private String m_docText;
 
@@ -85,11 +130,58 @@ public class BratDocumentViewerRepresentation extends JSONViewContent {
 
     private List<String> m_stopIndexes;
 
+    private List<String> m_colors;
+
     /**
-     * @param text the documentText to set
+     * Initialize the lists with terms and tags.
+     *
+     * @param doc the document
+     * @param terms the indexed terms of the document
      */
-    public void setDocumentText(final String text) {
-        m_docText = text;
+    public void init(final Document doc, final List<IndexedTerm> terms) {
+        m_termIds = new ArrayList<String>();
+        m_tags = new ArrayList<String>();
+        m_terms = new ArrayList<String>();
+        m_startIndexes = new ArrayList<String>();
+        m_stopIndexes = new ArrayList<String>();
+
+        m_docText = doc.getDocumentBodyText();
+        m_docTitle = doc.getTitle();
+        // we don't want to include the title in the body text
+        int titleLength = m_docTitle.length();
+
+        // index used for term ID
+        int idx = 1;
+        for (IndexedTerm term : terms) {
+            for (String tag : term.getTagValues()) {
+                int firstPos = term.getStartIndex() - titleLength;
+                int lastPos = term.getStopIndex() - titleLength;
+                // if firstPos < 0, it means the current term is the title, which we don't want, so skip it
+                if (firstPos >= 0) {
+                    m_termIds.add("T" + idx++);
+                    m_tags.add(tag);
+                    m_terms.add(term.getTermValue());
+                    m_startIndexes.add(Integer.toString(firstPos));
+                    m_stopIndexes.add(Integer.toString(lastPos));
+                }
+            }
+        }
+        // generate colors for tags
+        setRandColorToTags();
+    }
+
+    /**
+     * Generate random static color for each tag.
+     */
+    private void setRandColorToTags() {
+        m_colors = new ArrayList<String>();
+        // get unique tags
+        List<String> tags = m_tags.stream().distinct().collect(Collectors.toList());
+        // set random color
+        for (String tag : tags) {
+            Color randColor = new Color((int)(new Random(tag.hashCode()).nextDouble() * 0x1000000)).brighter();
+            m_colors.add(String.format("#%02x%02x%02x", randColor.getRed(), randColor.getGreen(), randColor.getBlue()));
+        }
     }
 
     /**
@@ -100,6 +192,13 @@ public class BratDocumentViewerRepresentation extends JSONViewContent {
     }
 
     /**
+     * @param docText the documentText to set
+     */
+    public void setDocumentText(final String docText) {
+        m_docText = docText;
+    }
+
+    /**
      * @return the documentTitle
      */
     public String getDocumentTitle() {
@@ -107,10 +206,10 @@ public class BratDocumentViewerRepresentation extends JSONViewContent {
     }
 
     /**
-     * @param documentTitle the documentTitle to set
+     * @param docTitle the documentTitle to set
      */
-    public void setDocumentTitle(final String documentTitle) {
-        this.m_docTitle = documentTitle;
+    public void setDocumentTitle(final String docTitle) {
+        m_docTitle = docTitle;
     }
 
     /**
@@ -124,7 +223,7 @@ public class BratDocumentViewerRepresentation extends JSONViewContent {
      * @param termIds the termIds to set
      */
     public void setTermIds(final List<String> termIds) {
-        this.m_termIds = termIds;
+        m_termIds = termIds;
     }
 
     /**
@@ -138,7 +237,7 @@ public class BratDocumentViewerRepresentation extends JSONViewContent {
      * @param tags the tags to set
      */
     public void setTags(final List<String> tags) {
-        this.m_tags = tags;
+        m_tags = tags;
     }
 
     /**
@@ -152,7 +251,7 @@ public class BratDocumentViewerRepresentation extends JSONViewContent {
      * @param terms the terms to set
      */
     public void setTerms(final List<String> terms) {
-        this.m_terms = terms;
+        m_terms = terms;
     }
 
     /**
@@ -166,7 +265,7 @@ public class BratDocumentViewerRepresentation extends JSONViewContent {
      * @param startIndexes the startIndexes to set
      */
     public void setStartIndexes(final List<String> startIndexes) {
-        this.m_startIndexes = startIndexes;
+        m_startIndexes = startIndexes;
     }
 
     /**
@@ -180,7 +279,21 @@ public class BratDocumentViewerRepresentation extends JSONViewContent {
      * @param stopIndexes the stopIndexes to set
      */
     public void setStopIndexes(final List<String> stopIndexes) {
-        this.m_stopIndexes = stopIndexes;
+        m_stopIndexes = stopIndexes;
+    }
+
+    /**
+     * @return the colors
+     */
+    public List<String> getColors() {
+        return m_colors;
+    }
+
+    /**
+     * @param colors the colors to set
+     */
+    public void setColors(final List<String> colors) {
+        m_colors = colors;
     }
 
     /**
@@ -189,13 +302,14 @@ public class BratDocumentViewerRepresentation extends JSONViewContent {
     @Override
     public void saveToNodeSettings(final NodeSettingsWO settings) {
         if (m_docText != null && m_terms != null) {
-            settings.addString(BratDocumentViewerConfigKeys.DOC_TEXT, m_docText);
-            settings.addString(BratDocumentViewerConfigKeys.DOC_TITLE, m_docTitle);
-            settings.addStringArray(BratDocumentViewerConfigKeys.DOC_TERM_IDS, m_termIds.toArray(new String[]{}));
-            settings.addStringArray(BratDocumentViewerConfigKeys.DOC_TERMS, m_terms.toArray(new String[]{}));
-            settings.addStringArray(BratDocumentViewerConfigKeys.DOC_TAGS, m_tags.toArray(new String[]{}));
-            settings.addStringArray(BratDocumentViewerConfigKeys.DOC_START_IDX, m_startIndexes.toArray(new String[]{}));
-            settings.addStringArray(BratDocumentViewerConfigKeys.DOC_STOP_IDX, m_stopIndexes.toArray(new String[]{}));
+            settings.addString(CFG_DOC_TEXT, m_docText);
+            settings.addString(CFG_DOC_TITLE, m_docTitle);
+            settings.addStringArray(CFG_DOC_TERM_IDS, m_termIds.toArray(new String[]{}));
+            settings.addStringArray(CFG_DOC_TERMS, m_terms.toArray(new String[]{}));
+            settings.addStringArray(CFG_DOC_TAGS, m_tags.toArray(new String[]{}));
+            settings.addStringArray(CFG_DOC_START_IDX, m_startIndexes.toArray(new String[]{}));
+            settings.addStringArray(CFG_DOC_STOP_IDX, m_stopIndexes.toArray(new String[]{}));
+            settings.addStringArray(CFG_DOC_COLORS, m_colors.toArray(new String[]{}));
         }
     }
 
@@ -204,13 +318,14 @@ public class BratDocumentViewerRepresentation extends JSONViewContent {
      */
     @Override
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        setDocumentText(settings.getString(BratDocumentViewerConfigKeys.DOC_TEXT));
-        setDocumentTitle(settings.getString(BratDocumentViewerConfigKeys.DOC_TITLE));
-        setTermIds(Arrays.asList(settings.getStringArray(BratDocumentViewerConfigKeys.DOC_TERM_IDS)));
-        setTerms(Arrays.asList(settings.getStringArray(BratDocumentViewerConfigKeys.DOC_TERMS)));
-        setTags(Arrays.asList(settings.getStringArray(BratDocumentViewerConfigKeys.DOC_TAGS)));
-        setStartIndexes(Arrays.asList(settings.getStringArray(BratDocumentViewerConfigKeys.DOC_START_IDX)));
-        setStopIndexes(Arrays.asList(settings.getStringArray(BratDocumentViewerConfigKeys.DOC_STOP_IDX)));
+        setDocumentText(settings.getString(CFG_DOC_TEXT));
+        setDocumentTitle(settings.getString(CFG_DOC_TITLE));
+        setTermIds(Arrays.asList(settings.getStringArray(CFG_DOC_TERM_IDS)));
+        setTerms(Arrays.asList(settings.getStringArray(CFG_DOC_TERMS)));
+        setTags(Arrays.asList(settings.getStringArray(CFG_DOC_TAGS)));
+        setStartIndexes(Arrays.asList(settings.getStringArray(CFG_DOC_START_IDX)));
+        setStopIndexes(Arrays.asList(settings.getStringArray(CFG_DOC_STOP_IDX)));
+        setColors(Arrays.asList(settings.getStringArray(CFG_DOC_COLORS)));
     }
 
     /**
@@ -231,7 +346,8 @@ public class BratDocumentViewerRepresentation extends JSONViewContent {
         BratDocumentViewerRepresentation other = (BratDocumentViewerRepresentation)obj;
         return new EqualsBuilder().append(m_docText, other.m_docText).append(m_docTitle, other.m_docTitle)
             .append(m_termIds, other.m_termIds).append(m_terms, other.m_terms).append(m_tags, other.m_tags)
-            .append(m_startIndexes, other.m_startIndexes).append(m_stopIndexes, other.m_stopIndexes).isEquals();
+            .append(m_startIndexes, other.m_startIndexes).append(m_stopIndexes, other.m_stopIndexes)
+            .append(m_colors, other.m_colors).isEquals();
     }
 
     /**
@@ -240,7 +356,7 @@ public class BratDocumentViewerRepresentation extends JSONViewContent {
     @Override
     public int hashCode() {
         return new HashCodeBuilder().append(m_docText).append(m_docTitle).append(m_termIds).append(m_terms)
-            .append(m_tags).append(m_startIndexes).append(m_stopIndexes).toHashCode();
+            .append(m_tags).append(m_startIndexes).append(m_stopIndexes).append(m_colors).toHashCode();
     }
 
 }

@@ -10,14 +10,16 @@
 	<fullDescription>
 		<intro>
 			This node visualizes terms and tags of a document using
-			<a href="http://brat.nlplab.org/embed.html">the Brat JS library</a>. Each term will be highlighted and its corresponding tags will be
+			<a href="http://brat.nlplab.org/embed.html">the Brat JS library</a>. 
+			Each term will be highlighted and its corresponding tags will be
 			displayed above it. The highlighting colors are static depending on
 			the tags.
-			Note: Only the document in the first row will be displayed.
+			<br />
+			<br />
+			<i>Note</i>: Only the document in the first row will be displayed.
 		</intro>
 		<option name="Document Column">
-			Specifies the document column containing the
-			documents to show.
+			The column containing the documents to show.
 		</option>
 
 	</fullDescription>
@@ -27,8 +29,7 @@
 	</interactiveView>
 	<ports>
 		<inPort name="Documents input table" index="0">
-			The input table
-			which contains the documents.
+			The input table containing the documents.
 		</inPort>
 	</ports>
 

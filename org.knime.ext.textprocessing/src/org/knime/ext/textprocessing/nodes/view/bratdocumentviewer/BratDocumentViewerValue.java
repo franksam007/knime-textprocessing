@@ -61,7 +61,7 @@ import org.knime.js.core.JSONViewContent;
  *
  * @author Andisa Dewi, KNIME AG, Berlin, Germany
  */
-public class BratDocumentViewerValue extends JSONViewContent {
+public final class BratDocumentViewerValue extends JSONViewContent {
 
     /**
      * {@inheritDoc}
@@ -69,7 +69,6 @@ public class BratDocumentViewerValue extends JSONViewContent {
     @Override
     public void saveToNodeSettings(final NodeSettingsWO settings) {
         // nothing to do
-
     }
 
     /**
@@ -78,7 +77,6 @@ public class BratDocumentViewerValue extends JSONViewContent {
     @Override
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         // nothing to do
-
     }
 
     /**
