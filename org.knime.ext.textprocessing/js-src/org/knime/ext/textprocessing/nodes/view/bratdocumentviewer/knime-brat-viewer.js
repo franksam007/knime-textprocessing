@@ -17,9 +17,6 @@ brat_doc_viewer = function() {
 				return;
 			}
 
-			d3.select("html").style("width", "100%").style("height", "100%");
-			var body = d3.select("body").style("width", "100%").style("height", "100%");
-
 			var tags = _representation.tags;
 			var title = _representation.documentTitle;
 			var text = _representation.documentText;
@@ -53,7 +50,12 @@ brat_doc_viewer = function() {
 				title = 'Untitled';			
 			}
 
-			body.append("h1").text(prefixTitle + title);
+			var body = document.getElementsByTagName('body')[0];
+			body.innerHTML = "<h1>" + prefixTitle + title + "</h1>"
+
+			var div = document.createElement('div');
+			div.id = VIZ_ID;
+			body.appendChild(div);
 
 		    Util.embed(VIZ_ID, $.extend({}, collData), $.extend({}, docData));
 
