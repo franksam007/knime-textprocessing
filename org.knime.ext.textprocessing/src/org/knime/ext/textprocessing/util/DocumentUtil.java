@@ -69,6 +69,7 @@ import org.knime.ext.textprocessing.data.Paragraph;
 import org.knime.ext.textprocessing.data.Section;
 import org.knime.ext.textprocessing.data.Sentence;
 import org.knime.ext.textprocessing.data.Term;
+import org.knime.ext.textprocessing.nodes.view.bratdocumentviewer.IndexedTerm;
 import org.knime.ext.textprocessing.util.clustering.Cluster;
 
 /**
@@ -429,5 +430,58 @@ public final class DocumentUtil {
         }
 
         return docs;
+    }
+
+    /**
+     * Get a list of terms from a document.
+     *
+     * @param doc the document
+     * @return the list of terms, or <code>Null</code> if no terms are found
+     * @since 3.8
+     */
+    public static List<Term> getTerms(final Document doc) {
+        List<Term> terms = null;
+        if (doc != null) {
+            terms = new ArrayList<Term>();
+            final Iterator<Sentence> it = doc.sentenceIterator();
+            while (it.hasNext()) {
+                terms.addAll(it.next().getTerms());
+            }
+        }
+        return terms;
+    }
+
+    /**
+     * Get terms from the input documents and find their position in the document text (start and stop indexes). The
+     * document text is fetched from <code>Document.getText()</code> method. Only terms that have at least one tag are
+     * included in the result.
+     *
+     * @param doc the document
+     * @return a list of indexed terms where all terms have at least one tag
+     * @since 3.8
+     */
+    public static List<IndexedTerm> getIndexedTerms(final Document doc) {
+        final List<IndexedTerm> result = new ArrayList<IndexedTerm>();
+        // include doc title
+        final String text = doc.getText();
+        // mark the start position to search a term in the text
+        int i = 0;
+        int startIndex = -1;
+        int stopIndex = -1;
+        final Iterator<Sentence> it = doc.sentenceIterator();
+        while (it.hasNext()) {
+            for (Term t : it.next().getTerms()) {
+                // only include terms with a least one tag
+                if (!t.getTags().isEmpty()) {
+                    final String term = t.getText();
+                    // get the start and stop index of the term in the text
+                    startIndex = text.indexOf(term, i);
+                    stopIndex = startIndex + term.length();
+                    i = stopIndex;
+                    result.add(new IndexedTerm(t, startIndex, stopIndex));
+                }
+            }
+        }
+        return result;
     }
 }
