@@ -31,6 +31,7 @@
 		<knime.tp.p2>${env.KNIME_TP_P2}</knime.tp.p2>
 		<knime.javasnippet.p2>${env.KNIME_JAVASNIPPET_P2}</knime.javasnippet.p2>
 		<knime.dl4j.p2>${env.KNIME_DL4J_P2}</knime.dl4j.p2>
+		<knime.svg.p2>${env.KNIME_SVG_P2}</knime.svg.p2>
 	</properties>
 
 	<modules>
@@ -88,6 +89,11 @@
 			<id>knime.dl4j.p2</id>
 			<layout>p2</layout>
 			<url>${knime.dl4j.p2}</url>
+		</repository>
+		<repository>
+			<id>knime.svg.p2</id>
+			<layout>p2</layout>
+			<url>${knime.svg.p2}</url>
 		</repository>
 	</repositories>
 </project>
